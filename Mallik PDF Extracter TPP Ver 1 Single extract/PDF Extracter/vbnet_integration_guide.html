@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VB.NET Integration Guide - PDF Extractor Server</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #06b6d4;
+            --bg-body: #0f172a;
+            --paper-bg: #ffffff;
+            --text-main: #334155;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            --highlight: #f0f9ff;
+            --badge-bg: #eff6ff;
+            --badge-text: #1d4ed8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.4;
+            font-size: 11px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Screen Display Wrapper */
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            gap: 30px;
+        }
+
+        .screen-actions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        /* Fixed Dimensions for Screen A4 Paper Preview */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            padding: 12mm 15mm;
+            background: var(--paper-bg);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Document Header */
+        .doc-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .doc-tag {
+            font-size: 9.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        .doc-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.4px;
+            line-height: 1.1;
+        }
+
+        .doc-subtitle {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .doc-meta {
+            text-align: right;
+            font-size: 9.5px;
+            color: var(--text-muted);
+            line-height: 1.25;
+        }
+
+        .doc-meta strong {
+            color: var(--text-dark);
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--secondary);
+            border-left: 3.5px solid var(--primary);
+            padding-left: 7px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title .badge {
+            font-size: 8.5px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: none;
+        }
+
+        p {
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        /* Flow Cards */
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .flow-card {
+            background: var(--highlight);
+            border: 1px solid #dbeafe;
+            border-radius: 5px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .flow-card-num {
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+            margin: 0 auto 3px auto;
+        }
+
+        .flow-card-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1px;
+        }
+
+        .flow-card-desc {
+            font-size: 9px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        /* Code Block Styling */
+        .code-container {
+            background: var(--code-bg);
+            border-radius: 5px;
+            padding: 6px 8px;
+            margin-bottom: 6px;
+            border: 1px solid #334155;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8.5px;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 3px;
+            margin-bottom: 4px;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8.5px;
+            color: var(--code-text);
+            line-height: 1.3;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Syntax Colors */
+        .kw { color: #569cd6; font-weight: 600; }
+        .st { color: #ce9178; }
+        .cm { color: #6a9955; font-style: italic; }
+        .num { color: #b5cea8; }
+        .prop { color: #9cdcfe; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5px;
+            margin-bottom: 6px;
+        }
+
+        th, td {
+            padding: 4px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--text-dark);
+            font-weight: 700;
+            border-top: 1px solid var(--border-color);
+        }
+
+        tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .control-tag {
+            font-family: 'JetBrains Mono', monospace;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        /* Grid for JSON Examples */
+        .json-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        /* Footer */
+        .doc-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 5px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 8.5px;
+            color: var(--text-muted);
+        }
+
+        /* ================= PERFECT A4 PRINT MEDIA RULES ================= */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            html, body {
+                width: 210mm;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .screen-actions {
+                display: none !important;
+            }
+
+            .page-container {
+                padding: 0 !important;
+                gap: 0 !important;
+            }
+
+            .a4-page {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 10mm 13mm !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                overflow: hidden !important;
+            }
+
+            .a4-page:last-child {
+                page-break-after: avoid !important;
+            }
+
+            .code-container {
+                border: 1px solid #cbd5e1 !important;
+                background: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-actions">
+        <button class="btn-print" onclick="window.print()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print / Save as PDF (A4)
+        </button>
+    </div>
+
+    <div class="page-container">
+
+        <!-- ================= PAGE 1 ================= -->
+        <div class="a4-page">
+            <div>
+                <!-- Header -->
+                <div class="doc-header">
+                    <div>
+                        <span class="doc-tag">Technical Integration Manual</span>
+                        <h1 class="doc-title">PDF Extractor Server — VB.NET Guide</h1>
+                        <p class="doc-subtitle">API Specification, Executable Usage & Response Structures</p>
+                    </div>
+                    <div class="doc-meta">
+                        <div><strong>Target URL:</strong> <code>http://127.0.0.1:8004/upload_pdf</code></div>
+                        <div><strong>Executable:</strong> <code>pdf_upload_server.exe</code></div>
+                        <div><strong>Format:</strong> Multi-Line Base64 CSV</div>
+                    </div>
+                </div>
+
+                <!-- Section 1: Overview & Flow -->
+                <div class="section">
+                    <div class="section-title">
+                        1. Workflow & Data Transfer Process
+                        <span class="badge">Round-Trip Architecture</span>
+                    </div>
+                    <div class="flow-grid">
+                        <div class="flow-card">
+                            <div class="flow-card-num">1</div>
+                            <div class="flow-card-title">Select PDF</div>
+                            <div class="flow-card-desc">User picks PDF file via <code>OpenFileDialog</code></div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-num">2</div>
+                            <div class="flow-card-title">Base64 Encode</div>
+                            <div class="flow-card-desc">VB.NET converts file bytes to Data URI string</div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-num">3</div>
+                            <div class="flow-card-title">POST Request</div>
+                            <div class="flow-card-desc">Sends JSON to <code>http://127.0.0.1:8004/upload_pdf</code></div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-num">4</div>
+                            <div class="flow-card-title">Populate Form</div>
+                            <div class="flow-card-desc">Regex extracts 8 metrics into form <code>TextBoxes</code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Server API Request & Response Specification -->
+                <div class="section">
+                    <div class="section-title">
+                        2. Server Request & Response JSON Specifications
+                        <span class="badge">HTTP POST /upload_pdf</span>
+                    </div>
+                    <p>The client sends a JSON payload with the Base64 PDF string. The server processes it via <code>pdfplumber</code> and returns a JSON payload containing the Base64-encoded CSV string alongside diagnostic dictionary metrics.</p>
+
+                    <div class="json-grid">
+                        <div>
+                            <div class="code-container">
+                                <div class="code-header">
+                                    <span>Client Request JSON Payload</span>
+                                    <span>POST /upload_pdf</span>
+                                </div>
+<pre>{
+  <span class="prop">"file"</span>: <span class="st">"data:application/pdf;base64,JVBERi0xLjQ..."</span>
+}</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="code-container">
+                                <div class="code-header">
+                                    <span>Server Response JSON Structure</span>
+                                    <span>HTTP 200 OK</span>
+                                </div>
+<pre>{
+  <span class="prop">"csv"</span>: <span class="st">"TWFjaGluZSBOYW1lIFRydUxh..."</span>,
+  <span class="prop">"fields"</span>: {
+    <span class="prop">"Machine Name (TextBox21)"</span>: <span class="st">"TruLaser_1030"</span>,
+    <span class="prop">"Process Quantity (TextBox26)"</span>: <span class="st">"5"</span>
+  }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Decoded CSV String Returned inside jsonResponse("csv")</span>
+                            <span>Multi-Line Plain Text</span>
+                        </div>
+<pre>Machine Name TruLaser_1030_L94_6KW,
+Material Name HR
+Laser Material Name HRAM0600---,
+Material Size 2500.00 x 1250.00 x 6.00 mm
+Thickness 6.00
+Raw Material Weight 147.19
+Process Length 50631.54
+Process Quantity 5</pre>
+                    </div>
+                </div>
+
+                <!-- Section 3: Server Execution & Auto-Start -->
+                <div class="section">
+                    <div class="section-title">
+                        3. Server Executable Deployment & VB.NET Auto-Start
+                        <span class="badge">Background Process</span>
+                    </div>
+                    <p><code>pdf_upload_server.exe</code> (in <code>dist\</code>) is a standalone binary. Place it alongside your application and run this helper on form load to guarantee it is active:</p>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>VB.NET — Automatic Server Process Launcher</span>
+                            <span>Helper Sub</span>
+                        </div>
+<pre><span class="kw">Private Sub</span> EnsurePdfServerRunning()
+    <span class="kw">Try</span>
+        <span class="kw">If</span> Process.GetProcessesByName(<span class="st">"pdf_upload_server"</span>).Length = <span class="num">0</span> <span class="kw">Then</span>
+            <span class="kw">Dim</span> exePath <span class="kw">As String</span> = Path.Combine(Application.StartupPath, <span class="st">"pdf_upload_server.exe"</span>)
+            <span class="kw">If</span> File.Exists(exePath) <span class="kw">Then</span>
+                <span class="kw">Dim</span> psi <span class="kw">As New</span> ProcessStartInfo(exePath) With {.WindowStyle = ProcessWindowStyle.Hidden}
+                Process.Start(psi)
+            <span class="kw">End If</span>
+        <span class="kw">End If</span>
+    <span class="kw">Catch</span> ex <span class="kw">As</span> Exception
+        Console.WriteLine(<span class="st">"Server auto-start check error: "</span> & ex.Message)
+    <span class="kw">End Try</span>
+<span class="kw">End Sub</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-footer">
+                <span>PDF Extractor Server Technical Documentation</span>
+                <span>Page 1 of 3</span>
+                <span>http://127.0.0.1:8004/upload_pdf</span>
+            </div>
+        </div>
+
+
+        <!-- ================= PAGE 2 ================= -->
+        <div class="a4-page">
+            <div>
+                <!-- Header -->
+                <div class="doc-header">
+                    <div>
+                        <span class="doc-tag">Implementation & Field Mapping</span>
+                        <h1 class="doc-title">Form Controls & Button7_Click Handler</h1>
+                        <p class="doc-subtitle">Control Mapping Table & File Picker Integration</p>
+                    </div>
+                    <div class="doc-meta">
+                        <div><strong>Framework:</strong> <code>VB.NET WinForms</code></div>
+                        <div><strong>JSON Library:</strong> <code>Newtonsoft.Json (JObject)</code></div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Data Field Mapping -->
+                <div class="section">
+                    <div class="section-title">
+                        4. Extracted Metrics & Form Control Mapping Table
+                        <span class="badge">8 Fields Extracted</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric Description</th>
+                                <th>CSV Line Header</th>
+                                <th>VB.NET Regex Extractor</th>
+                                <th>Target Control</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Machine Name</strong></td>
+                                <td><code>Machine Name ...</code></td>
+                                <td><code>ExtractWord(csvData, "Machine Name\s*(.*),")</code></td>
+                                <td><span class="control-tag">TextBox21</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Material Name</strong></td>
+                                <td><code>Material Name ...</code></td>
+                                <td><code>ExtractWord(csvData, "Material Name\s*(.*)")</code></td>
+                                <td><span class="control-tag">TextBox16</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Thickness</strong></td>
+                                <td><code>Thickness ...</code></td>
+                                <td><code>ExtractWord(csvData, "Thickness\s*(.*)")</code></td>
+                                <td><span class="control-tag">TextBox22</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Raw Material Weight</strong></td>
+                                <td><code>Raw Material Weight ...</code></td>
+                                <td><code>ExtractWord(csvData, "Raw Material Weight\s*(.*)")</code></td>
+                                <td><span class="control-tag">TextBox24</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Laser Material Name</strong></td>
+                                <td><code>Laser Material Name ...</code></td>
+                                <td><code>ExtractWord(csvData, "Laser Material Name\s*(.*),")</code></td>
+                                <td><span class="control-tag">TextBox27</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Process Length</strong></td>
+                                <td><code>Process Length ...</code></td>
+                                <td><code>ExtractWord(csvData, "Process Length\s*(.*)")</code></td>
+                                <td><span class="control-tag">TextBox25</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Material Size</strong></td>
+                                <td><code>Material Size ...</code></td>
+                                <td><code>ExtractWordmaterialSize(csvData, "Material Size\s*(.*?)$")</code></td>
+                                <td><span class="control-tag">TextBox18</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Process Quantity</strong></td>
+                                <td><code>Process Quantity ...</code></td>
+                                <td><code>ExtractWordProcessQty(csvData, "Process Quantity\s*(\d+(\.\d+)?)")</code></td>
+                                <td><span class="control-tag">TextBox26</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 5: VB.NET Code Part 1 -->
+                <div class="section">
+                    <div class="section-title">
+                        5. VB.NET Client Routine — Part 1: File Selection & Base64
+                        <span class="badge">Button7_Click & ConvertToBase64</span>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>VB.NET — Main Event Handler & Conversion Helper</span>
+                            <span>Button7_Click & ConvertToBase64</span>
+                        </div>
+<pre><span class="kw">Private Sub</span> Button7_Click(sender <span class="kw">As</span> Object, e <span class="kw">As</span> EventArgs) <span class="kw">Handles</span> Button7.Click
+    <span class="cm">' 1. Show OpenFileDialog to select PDF file</span>
+    <span class="kw">Dim</span> openFileDialog <span class="kw">As New</span> OpenFileDialog()
+    openFileDialog.Filter = <span class="st">"PDF Files (*.pdf)|*.pdf|All Files (*.*)|*.*"</span>
+    openFileDialog.Title = <span class="st">"Select a PDF File"</span>
+
+    <span class="kw">If</span> openFileDialog.ShowDialog() = DialogResult.OK <span class="kw">Then</span>
+        <span class="kw">Dim</span> selectedFilePath <span class="kw">As String</span> = openFileDialog.FileName
+        <span class="kw">Dim</span> destinationFolder <span class="kw">As String</span> = <span class="st">"\\MEIPLSERVER\TestFolder"</span>
+
+        <span class="kw">If Not</span> Directory.Exists(destinationFolder) <span class="kw">Then</span>
+            MessageBox.Show(<span class="st">"Destination folder does not exist or is not accessible."</span>)
+            <span class="kw">Return</span>
+        <span class="kw">End If</span>
+
+        <span class="kw">Dim</span> originalFileName <span class="kw">As String</span> = Path.GetFileNameWithoutExtension(selectedFilePath)
+        <span class="kw">Dim</span> fileExtension <span class="kw">As String</span> = Path.GetExtension(selectedFilePath)
+        <span class="kw">Dim</span> destinationFilePath <span class="kw">As String</span> = Path.Combine(destinationFolder, Path.GetFileName(selectedFilePath))
+
+        <span class="kw">Dim</span> fileCounter <span class="kw">As Integer</span> = <span class="num">1</span>
+        <span class="kw">While</span> File.Exists(destinationFilePath)
+            destinationFilePath = Path.Combine(destinationFolder, originalFileName & <span class="st">"_"</span> & fileCounter.ToString() & fileExtension)
+            fileCounter += <span class="num">1</span>
+        <span class="kw">End While</span>
+
+        <span class="kw">Try</span>
+            File.Copy(selectedFilePath, destinationFilePath, <span class="kw">True</span>)
+            MessageBox.Show(<span class="st">"PDF file saved to: "</span> & destinationFilePath)
+            pdfpath = destinationFilePath
+
+            <span class="cm">' 2. Convert PDF to Base64 URI & Upload</span>
+            <span class="kw">Dim</span> base64String <span class="kw">As String</span> = ConvertToBase64(destinationFilePath)
+            UploadPdf(base64String)
+        <span class="kw">Catch</span> ex <span class="kw">As</span> Exception
+            MessageBox.Show(<span class="st">"Error copying or uploading file: "</span> & ex.Message)
+        <span class="kw">End Try</span>
+    <span class="kw">End If</span>
+<span class="kw">End Sub</span>
+
+<span class="kw">Private Function</span> ConvertToBase64(filePath <span class="kw">As String</span>) <span class="kw">As String</span>
+    <span class="kw">Try</span>
+        <span class="kw">Dim</span> fileBytes() <span class="kw">As Byte</span> = File.ReadAllBytes(filePath)
+        <span class="kw">Return</span> <span class="st">"data:application/pdf;base64,"</span> & Convert.ToBase64String(fileBytes)
+    <span class="kw">Catch</span> ex <span class="kw">As</span> Exception
+        MessageBox.Show(<span class="st">"Error converting file to Base64: "</span> & ex.Message)
+        <span class="kw">Return String</span>.Empty
+    <span class="kw">End Try</span>
+<span class="kw">End Function</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-footer">
+                <span>PDF Extractor Server Technical Documentation</span>
+                <span>Page 2 of 3</span>
+                <span>http://127.0.0.1:8004/upload_pdf</span>
+            </div>
+        </div>
+
+
+        <!-- ================= PAGE 3 ================= -->
+        <div class="a4-page">
+            <div>
+                <!-- Header -->
+                <div class="doc-header">
+                    <div>
+                        <span class="doc-tag">Implementation & Helpers</span>
+                        <h1 class="doc-title">HTTP Upload & Regex Parsing Helpers</h1>
+                        <p class="doc-subtitle">UploadPdf Subroutine & Regex Parsing Functions</p>
+                    </div>
+                    <div class="doc-meta">
+                        <div><strong>Server Target:</strong> <code>http://127.0.0.1:8004/upload_pdf</code></div>
+                        <div><strong>JSON Parser:</strong> <code>Newtonsoft.Json</code></div>
+                    </div>
+                </div>
+
+                <!-- Section 6: UploadPdf Sub -->
+                <div class="section">
+                    <div class="section-title">
+                        6. VB.NET Client Routine — Part 2: HTTP POST & Form Control Assignment
+                        <span class="badge">UploadPdf Subroutine</span>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>VB.NET — UploadPdf Routine & TextBox Population</span>
+                            <span>UploadPdf Sub</span>
+                        </div>
+<pre><span class="kw">Private Sub</span> UploadPdf(base64String <span class="kw">As String</span>)
+    <span class="kw">If String</span>.IsNullOrEmpty(base64String) <span class="kw">Then</span>
+        MessageBox.Show(<span class="st">"Base64 string is empty."</span>)
+        <span class="kw">Return</span>
+    <span class="kw">End If</span>
+
+    <span class="kw">Dim</span> url <span class="kw">As String</span> = <span class="st">"http://127.0.0.1:8004/upload_pdf"</span>
+
+    <span class="kw">Try</span>
+        <span class="kw">Dim</span> request <span class="kw">As</span> HttpWebRequest = CType(WebRequest.Create(url), HttpWebRequest)
+        request.Method = <span class="st">"POST"</span>
+        request.ContentType = <span class="st">"application/json"</span>
+
+        <span class="kw">Dim</span> json <span class="kw">As String</span> = <span class="st">"{"</span><span class="st">""</span>file<span class="st">""</span>:<span class="st">"""</span> & base64String & <span class="st">""""</span>}</span>
+        <span class="kw">Dim</span> postData <span class="kw">As Byte</span>() = Encoding.UTF8.GetBytes(json)
+        request.ContentLength = postData.Length
+
+        <span class="kw">Using</span> requestStream <span class="kw">As</span> Stream = request.GetRequestStream()
+            requestStream.Write(postData, <span class="num">0</span>, postData.Length)
+        <span class="kw">End Using</span>
+
+        <span class="kw">Using</span> response <span class="kw">As</span> WebResponse = request.GetResponse()
+            <span class="kw">Using</span> responseStream <span class="kw">As</span> Stream = response.GetResponseStream()
+                <span class="kw">Using</span> reader <span class="kw">As New</span> StreamReader(responseStream)
+                    <span class="kw">Dim</span> responseFromServer <span class="kw">As String</span> = reader.ReadToEnd()
+                    <span class="kw">Dim</span> jsonResponse <span class="kw">As</span> JObject = JObject.Parse(responseFromServer)
+
+                    <span class="kw">If</span> jsonResponse.ContainsKey(<span class="st">"csv"</span>) <span class="kw">Then</span>
+                        <span class="kw">Dim</span> csvBase64 <span class="kw">As String</span> = jsonResponse(<span class="st">"csv"</span>).ToString()
+                        <span class="kw">Dim</span> fileBytes() <span class="kw">As Byte</span> = Convert.FromBase64String(csvBase64)
+                        <span class="kw">Dim</span> csvData <span class="kw">As String</span> = Encoding.UTF8.GetString(fileBytes)
+
+                        <span class="cm">' Parse CSV and update WinForms Controls</span>
+                        TextBox21.Text = ExtractWord(csvData, <span class="st">"Machine Name\s*(.*),"</span>).Replace(<span class="st">","</span>, <span class="st">""</span>)
+                        TextBox16.Text = ExtractWord(csvData, <span class="st">"Material Name\s*(.*)"</span>).Replace(<span class="st">"E-L2"</span>, <span class="st">""</span>).Replace(<span class="st">","</span>, <span class="st">""</span>).Trim()
+                        TextBox22.Text = ExtractWord(csvData, <span class="st">"Thickness\s*(.*)"</span>).Replace(<span class="st">","</span>, <span class="st">""</span>)
+                        TextBox24.Text = ExtractWord(csvData, <span class="st">"Raw Material Weight\s*(.*)"</span>).Replace(<span class="st">"Process"</span>, <span class="st">""</span>).Replace(<span class="st">","</span>, <span class="st">""</span>).Trim()
+                        TextBox27.Text = ExtractWord(csvData, <span class="st">"Laser Material Name\s*(.*),"</span>).Replace(<span class="st">","</span>, <span class="st">""</span>)
+                        TextBox25.Text = ExtractWord(csvData, <span class="st">"Process Length\s*(.*)"</span>).Replace(<span class="st">"Process"</span>, <span class="st">""</span>).Replace(<span class="st">","</span>, <span class="st">""</span>).Trim()
+                        TextBox18.Text = ExtractWordmaterialSize(csvData, <span class="st">"Material Size\s*(.*?)$"</span>).Replace(<span class="st">"Thickness.*"</span>, <span class="st">""</span>).Replace(<span class="st">","</span>, <span class="st">""</span>).Trim()
+                        TextBox26.Text = ExtractWordProcessQty(csvData, <span class="st">"Process Quantity\s*(\d+(\.\d+)?)"</span>)
+                    <span class="kw">Else</span>
+                        MessageBox.Show(<span class="st">"CSV data not found in the response."</span>)
+                    <span class="kw">End If</span>
+                <span class="kw">End Using</span>
+            <span class="kw">End Using</span>
+        <span class="kw">End Using</span>
+    <span class="kw">Catch</span> ex <span class="kw">As</span> Exception
+        MessageBox.Show(<span class="st">"Error uploading file: "</span> & ex.Message)
+    <span class="kw">End Try</span>
+<span class="kw">End Sub</span></pre>
+                    </div>
+                </div>
+
+                <!-- Section 7: Helper Extraction Functions -->
+                <div class="section">
+                    <div class="section-title">
+                        7. VB.NET Helper Extraction Functions
+                        <span class="badge">Regex Helpers</span>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>VB.NET — Regular Expression Helper Functions</span>
+                            <span>Helper Functions</span>
+                        </div>
+<pre><span class="kw">Private Function</span> ExtractWord(data <span class="kw">As String</span>, pattern <span class="kw">As String</span>) <span class="kw">As String</span>
+    <span class="kw">Dim</span> match <span class="kw">As</span> Match = Regex.Match(data, pattern)
+    <span class="kw">If</span> match.Success <span class="kw">Then Return</span> match.Groups(<span class="num">1</span>).Value.Split(<span class="st">" "</span>c)(<span class="num">0</span>)
+    <span class="kw">Return String</span>.Empty
+<span class="kw">End Function</span>
+
+<span class="kw">Private Function</span> ExtractWordmaterialSize(data <span class="kw">As String</span>, pattern <span class="kw">As String</span>) <span class="kw">As String</span>
+    <span class="kw">Dim</span> match <span class="kw">As</span> Match = Regex.Match(data, pattern, RegexOptions.Multiline)
+    <span class="kw">If</span> match.Success <span class="kw">Then</span>
+        <span class="kw">Return</span> Regex.Replace(match.Groups(<span class="num">1</span>).Value, <span class="st">"Thickness.*"</span>, <span class="st">""</span>).Trim()
+    <span class="kw">End If</span>
+    <span class="kw">Return String</span>.Empty
+<span class="kw">End Function</span>
+
+<span class="kw">Private Function</span> ExtractWordProcessQty(data <span class="kw">As String</span>, pattern <span class="kw">As String</span>) <span class="kw">As String</span>
+    <span class="kw">Dim</span> match <span class="kw">As</span> Match = Regex.Match(data, pattern)
+    <span class="kw">If</span> match.Success <span class="kw">Then</span>
+        <span class="kw">Dim</span> integerValue <span class="kw">As Integer</span>
+        <span class="kw">If Integer</span>.TryParse(match.Groups(<span class="num">1</span>).Value.Split(<span class="st">" "</span>c)(<span class="num">0</span>).Split(<span class="st">"."</span>c)(<span class="num">0</span>), integerValue) <span class="kw">Then</span>
+            <span class="kw">Return</span> integerValue.ToString()
+        <span class="kw">End If</span>
+    <span class="kw">End If</span>
+    <span class="kw">Return String</span>.Empty
+<span class="kw">End Function</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-footer">
+                <span>PDF Extractor Server Technical Documentation</span>
+                <span>Page 3 of 3</span>
+                <span>http://127.0.0.1:8004/upload_pdf</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

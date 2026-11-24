@@ -1,0 +1,12 @@
+# 1. Install dependencies
+pip install pdfplumber fastapi uvicorn httpx pydantic
+
+# 2. Run standalone extractor on PDF
+python extract_pdf_data.py "D:\Download\My_Home_GRAVA_6MMHR_SetupPlan (1).pdf" --out extracted.csv
+
+# 3. Run the FastAPI server (for VB.NET client connection)
+python pdf_upload_server.py
+# -> listens on http://0.0.0.0:8004/upload_pdf
+
+# 4. Verify end-to-end integration
+python test_end_to_end.py

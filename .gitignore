@@ -1,0 +1,25 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# PyInstaller intermediate build directories
+# Note: Intermediate compiler files are excluded; precompiled executables in dist/ remain available.
+build/
+*.spec.bak
+
+# Upload directory temporary files (keeps the folder via .gitkeep)
+uploads/*.pdf
+uploads/upload_*
+
+# Environment & editor files
+.env
+.venv/
+env/
+venv/
+ENV/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VB.NET Multi-Extract Integration Guide — Form5 Update</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #0ea5e9;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --bg-body: #0b1120;
+            --paper-bg: #ffffff;
+            --text-main: #334155;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+            --highlight: #f0f9ff;
+            --badge-bg: #eff6ff;
+            --badge-text: #1d4ed8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+            font-size: 13px;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
+            padding: 32px 40px;
+            border-bottom: 4px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        .content {
+            padding: 36px 40px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--secondary);
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 11px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: none;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .card h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .code-container {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 12px 0 18px 0;
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: var(--code-text);
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .kw { color: #569cd6; font-weight: 600; }
+        .st { color: #ce9178; }
+        .cm { color: #6a9955; font-style: italic; }
+        .prop { color: #9cdcfe; }
+        .num { color: #b5cea8; }
+
+        .diff-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 800px) {
+            .diff-grid { grid-template-columns: 1fr; }
+        }
+
+        .diff-col {
+            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid;
+        }
+
+        .diff-old {
+            background: #fff1f2;
+            border-color: #fecdd3;
+        }
+
+        .diff-new {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .diff-header {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .diff-old .diff-header { color: #be123c; }
+        .diff-new .diff-header { color: #15803d; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .callout {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+            font-size: 12.5px;
+            color: #1e3a8a;
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; }
+            .btn-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>VB.NET Multi-Extract Integration Guide</h1>
+                <p>Support Multi-Program TRUMPF Setup Plan PDFs in <code>Form5</code> with ComboBox Dropdown</p>
+            </div>
+            <button class="btn-print" onclick="window.print()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Print to PDF (A4)
+            </button>
+        </div>
+
+        <div class="content">
+
+            <!-- Section 1: Executive Summary -->
+            <div class="section">
+                <div class="section-title">
+                    1. Summary of Changes
+                    <span class="badge badge-success">Minimal VB.NET Code</span>
+                </div>
+                <p>When a setup plan PDF contains multiple NC programs (e.g. 18 programs in a 24-page file), the Python server now extracts <strong>all individual programs</strong> and returns them in a structured dictionary. This enables the VB.NET Form to:</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>1. Populate ComboBox</h4>
+                        <p>Fills a dropdown with all NC program names (e.g. <code>VIHANG_Gaur_3MMHR_1</code>, <code>_3</code>, etc.) and auto-selects the first one.</p>
+                    </div>
+                    <div class="card">
+                        <h4>2. Direct 1:1 Binding</h4>
+                        <p>Selecting any program from the ComboBox instantly fills all 8 textboxes with 100% clean, pre-sanitized values.</p>
+                    </div>
+                    <div class="card">
+                        <h4>3. Zero Regex Headaches</h4>
+                        <p>No more fragile <code>ExtractWord()</code> or manual string replacements like <code>.Replace("Process", "")</code>!</p>
+                    </div>
+                    <div class="card">
+                        <h4>4. Single & Multi Compatible</h4>
+                        <p>Works seamlessly for both single-sheet plans (1 item in dropdown) and multi-sheet plans (18+ items in dropdown).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Form5 UI Layout -->
+            <div class="section">
+                <div class="section-title">
+                    2. Recommended WinForms UI Adjustment
+                    <span class="badge">Visual Layout</span>
+                </div>
+                <p>On <strong>Form5</strong>, located right below the <strong>"Upload PDF : [ Browse ]"</strong> button, there is the <strong>Program Code</strong> field:</p>
+                <div class="callout">
+                    <strong>UI Recommendation:</strong> Replace the <code>Program Code</code> TextBox (or add alongside it) a <strong>ComboBox</strong> named <code>ComboBoxProgramCode</code> (with <code>DropDownStyle = DropDownList</code>).
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Control Name</th>
+                            <th>Field Name</th>
+                            <th>Action When ComboBox Program Changes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>ComboBoxProgramCode</code></td><td>Program Code</td><td>Dropdown list of all NC program names</td></tr>
+                        <tr><td><code>TextBox21</code></td><td>Machine Name</td><td>Auto-populated: e.g. <code>TruLaser_1030_L94_6KW</code></td></tr>
+                        <tr><td><code>TextBox16</code></td><td>Material Name</td><td>Auto-populated: e.g. <code>HR</code></td></tr>
+                        <tr><td><code>TextBox22</code></td><td>Thickness</td><td>Auto-populated: e.g. <code>3.00</code></td></tr>
+                        <tr><td><code>TextBox24</code></td><td>Raw Material Weight</td><td>Auto-populated: e.g. <code>44.16</code></td></tr>
+                        <tr><td><code>TextBox26</code></td><td>Process Qty (Rpt)</td><td>Auto-populated: e.g. <code>2</code></td></tr>
+                        <tr><td><code>TextBox27</code></td><td>Laser Material Name</td><td>Auto-populated: e.g. <code>HRAM0300---</code></td></tr>
+                        <tr><td><code>TextBox25</code></td><td>Process Length</td><td>Auto-populated: e.g. <code>19722.08</code></td></tr>
+                        <tr><td><code>TextBox18</code></td><td>Size No (Dimensions)</td><td>Auto-populated: e.g. <code>1500.00 x 1250.00 x 3.00 mm</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 3: Server JSON Payload Specification -->
+            <div class="section">
+                <div class="section-title">
+                    3. Server Response JSON Structure
+                    <span class="badge">POST /upload_pdf (Port 8004)</span>
+                </div>
+                <p>The response now includes a <code>"programs"</code> dictionary keyed by the NC Program Name:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>HTTP 200 OK — JSON Response</span>
+                        <span>application/json</span>
+                    </div>
+<pre>{
+  <span class="prop">"total_programs"</span>: <span class="num">18</span>,
+  <span class="prop">"default_program"</span>: <span class="st">"VIHANG_Gaur_3MMHR_1"</span>,
+  <span class="prop">"programs"</span>: {
+    <span class="prop">"VIHANG_Gaur_3MMHR_1"</span>: {
+      <span class="prop">"Program Name"</span>: <span class="st">"VIHANG_Gaur_3MMHR_1"</span>,
+      <span class="prop">"Machine Name"</span>: <span class="st">"TruLaser_1030_L94_6KW"</span>,
+      <span class="prop">"Material Name"</span>: <span class="st">"HR"</span>,
+      <span class="prop">"Thickness"</span>: <span class="st">"3.00"</span>,
+      <span class="prop">"Raw Material Weight"</span>: <span class="st">"44.16"</span>,
+      <span class="prop">"Process Length"</span>: <span class="st">"19722.08"</span>,
+      <span class="prop">"Laser Material Name"</span>: <span class="st">"HRAM0300---"</span>,
+      <span class="prop">"Material Size"</span>: <span class="st">"1500.00 x 1250.00 x 3.00 mm"</span>,
+      <span class="prop">"Process Quantity"</span>: <span class="st">"2"</span>
+    },
+    <span class="prop">"VIHANG_Gaur_3MMHR_3"</span>: {
+      <span class="prop">"Program Name"</span>: <span class="st">"VIHANG_Gaur_3MMHR_3"</span>,
+      <span class="prop">"Machine Name"</span>: <span class="st">"TruLaser_1030_L94_6KW"</span>,
+      <span class="prop">"Material Name"</span>: <span class="st">"HR"</span>,
+      <span class="prop">"Thickness"</span>: <span class="st">"3.00"</span>,
+      <span class="prop">"Raw Material Weight"</span>: <span class="st">"44.16"</span>,
+      <span class="prop">"Process Length"</span>: <span class="st">"21255.34"</span>,
+      <span class="prop">"Laser Material Name"</span>: <span class="st">"HRAM0300---"</span>,
+      <span class="prop">"Material Size"</span>: <span class="st">"1500.00 x 1250.00 x 3.00 mm"</span>,
+      <span class="prop">"Process Quantity"</span>: <span class="st">"2"</span>
+    }
+  },
+  <span class="prop">"csv"</span>: <span class="st">"&lt;base64_encoded_first_program_csv&gt;"</span>,
+  <span class="prop">"fields"</span>: { ... }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Section 4: VB.NET Code Implementation -->
+            <div class="section">
+                <div class="section-title">
+                    4. Exact VB.NET Code Changes
+                    <span class="badge badge-success">3 Easy Steps</span>
+                </div>
+
+                <h4 style="margin: 14px 0 6px 0;">Step 1: Declare Class-Level Variable</h4>
+                <p>At the top of <code>Form5</code> (inside <code>Public Class Form5</code>), add a variable to hold the returned programs:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Form5.vb — Class Declarations</span>
+                        <span>VB.NET</span>
+                    </div>
+<pre><span class="cm">' Stores the dictionary of all programs from the uploaded PDF</span>
+<span class="kw">Private</span> pdfPrograms <span class="kw">As</span> JObject</pre>
+                </div>
+
+                <h4 style="margin: 18px 0 6px 0;">Step 2: Update <code>UploadPdf()</code> Method</h4>
+                <p>Replace the single regex extraction block with this dropdown population logic:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Form5.vb — Inside UploadPdf(base64String As String)</span>
+                        <span>VB.NET</span>
+                    </div>
+<pre><span class="kw">Using</span> response <span class="kw">As</span> WebResponse = request.GetResponse()
+    <span class="kw">Using</span> responseStream <span class="kw">As</span> Stream = response.GetResponseStream()
+        <span class="kw">Using</span> reader <span class="kw">As New</span> StreamReader(responseStream)
+            <span class="kw">Dim</span> responseFromServer <span class="kw">As String</span> = reader.ReadToEnd()
+            <span class="kw">Dim</span> jsonResponse <span class="kw">As</span> JObject = JObject.Parse(responseFromServer)
+
+            <span class="cm">' Multi-program response handling</span>
+            <span class="kw">If</span> jsonResponse.ContainsKey(<span class="st">"programs"</span>) <span class="kw">Then</span>
+                pdfPrograms = CType(jsonResponse(<span class="st">"programs"</span>), JObject)
+
+                <span class="cm">' 1. Clear and populate ComboBox with all program names</span>
+                ComboBoxProgramCode.Items.Clear()
+                <span class="kw">For Each</span> prop <span class="kw">In</span> pdfPrograms.Properties()
+                    ComboBoxProgramCode.Items.Add(prop.Name)
+                <span class="kw">Next</span>
+
+                <span class="cm">' 2. Auto-select first program (triggers SelectedIndexChanged)</span>
+                <span class="kw">If</span> ComboBoxProgramCode.Items.Count &gt; <span class="num">0</span> <span class="kw">Then</span>
+                    ComboBoxProgramCode.SelectedIndex = <span class="num">0</span>
+                    MessageBox.Show(<span class="st">"Extracted "</span> &amp; ComboBoxProgramCode.Items.Count.ToString() &amp; <span class="st">" NC Programs from PDF!"</span>)
+                <span class="kw">End If</span>
+            <span class="kw">ElseIf</span> jsonResponse.ContainsKey(<span class="st">"csv"</span>) <span class="kw">Then</span>
+                <span class="cm">' Fallback for legacy single-program response if needed</span>
+                MessageBox.Show(<span class="st">"Single program extracted."</span>)
+            <span class="kw">Else</span>
+                MessageBox.Show(<span class="st">"No data found in the server response."</span>)
+            <span class="kw">End If</span>
+        <span class="kw">End Using</span>
+    <span class="kw">End Using</span>
+<span class="kw">End Using</span></pre>
+                </div>
+
+                <h4 style="margin: 18px 0 6px 0;">Step 3: Add ComboBox <code>SelectedIndexChanged</code> Event</h4>
+                <p>When the user changes the program in the dropdown, this event immediately populates the Form controls:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Form5.vb — Event Handler</span>
+                        <span>VB.NET</span>
+                    </div>
+<pre><span class="kw">Private Sub</span> ComboBoxProgramCode_SelectedIndexChanged(sender <span class="kw">As</span> Object, e <span class="kw">As</span> EventArgs) Handles ComboBoxProgramCode.SelectedIndexChanged
+    <span class="kw">If</span> pdfPrograms <span class="kw">Is Nothing</span> OrElse ComboBoxProgramCode.SelectedIndex = -<span class="num">1</span> <span class="kw">Then Return</span>
+
+    <span class="kw">Dim</span> programName <span class="kw">As String</span> = ComboBoxProgramCode.SelectedItem.ToString()
+    <span class="kw">Dim</span> p <span class="kw">As</span> JToken = pdfPrograms(programName)
+    <span class="kw">If</span> p <span class="kw">Is Nothing Then Return</span>
+
+    <span class="cm">' 1. Program Code Textbox (TextBox10 or Label)</span>
+    TextBox10.Text = programName
+
+    <span class="cm">' 2. Direct 1:1 Clean Assignment into Controls</span>
+    TextBox21.Text = p(<span class="st">"Machine Name"</span>).ToString()
+    TextBox16.Text = p(<span class="st">"Material Name"</span>).ToString()
+    TextBox22.Text = p(<span class="st">"Thickness"</span>).ToString()
+    TextBox24.Text = p(<span class="st">"Raw Material Weight"</span>).ToString()
+    TextBox26.Text = p(<span class="st">"Process Quantity"</span>).ToString()
+    TextBox27.Text = p(<span class="st">"Laser Material Name"</span>).ToString()
+    TextBox25.Text = p(<span class="st">"Process Length"</span>).ToString()
+    TextBox18.Text = p(<span class="st">"Material Size"</span>).ToString()
+<span class="kw">End Sub</span></pre>
+                </div>
+            </div>
+
+            <!-- Section 5: Side-by-Side Comparison -->
+            <div class="section">
+                <div class="section-title">
+                    5. Why This Simplifies Your Code
+                    <span class="badge">Before vs. After</span>
+                </div>
+                <div class="diff-grid">
+                    <div class="diff-col diff-old">
+                        <div class="diff-header">❌ BEFORE: Fragile Regex on Raw String</div>
+                        <pre><span class="cm">' Complex regex and fragile trims</span>
+TextBox21.Text = ExtractWord(csvData, <span class="st">"Machine Name\s*(.*),"</span>).Replace(<span class="st">","</span>, <span class="st">""</span>)
+TextBox16.Text = ExtractWord(csvData, <span class="st">"Material Name\s*(.*)"</span>).Replace(<span class="st">"E-L2"</span>, <span class="st">""</span>).Trim()
+TextBox24.Text = ExtractWord(csvData, <span class="st">"Raw Material Weight\s*(.*)"</span>).Replace(<span class="st">"Process"</span>, <span class="st">""</span>).Trim()
+TextBox25.Text = ExtractWord(csvData, <span class="st">"Process Length\s*(.*)"</span>).Replace(<span class="st">"Process"</span>, <span class="st">""</span>).Trim()</pre>
+                    </div>
+                    <div class="diff-col diff-new">
+                        <div class="diff-header">✅ AFTER: Direct Clean JSON Properties</div>
+                        <pre><span class="cm">' Clean direct property access</span>
+TextBox21.Text = p(<span class="st">"Machine Name"</span>).ToString()
+TextBox16.Text = p(<span class="st">"Material Name"</span>).ToString()
+TextBox24.Text = p(<span class="st">"Raw Material Weight"</span>).ToString()
+TextBox25.Text = p(<span class="st">"Process Length"</span>).ToString()
+<span class="cm">' Zero regex, zero trimming bugs!</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Saving to MySQL -->
+            <div class="section">
+                <div class="section-title">
+                    6. Upload Nesting (Save to MySQL)
+                    <span class="badge">Button10_Click</span>
+                </div>
+                <p>When the user clicks <strong>"Upload Nesting" (Button10)</strong>, the code will seamlessly insert the currently selected NC Program details because all the TextBoxes (<code>TextBox21</code>, <code>TextBox16</code>, <code>TextBox22</code>, etc.) are already populated with the exact values for that program!</p>
+                <div class="callout">
+                    <strong>Note:</strong> If the user wants to upload all 18 programs into the database at once instead of one by one, a simple loop over <code>pdfPrograms.Properties()</code> can execute the <code>INSERT</code> query for all programs in a single click!
+                </div>
+            </div>
+
+            <!-- Section 7: Blank Material Validation & Popup Alerts -->
+            <div class="section">
+                <div class="section-title">
+                    7. Blank Material Validation & Pop-up Handling
+                    <span class="badge badge-success">Automated Warning</span>
+                </div>
+                <p>If an uploaded PDF has <strong>Material</strong> left blank by the CAD/CAM operator, the Python server detects it and returns:</p>
+                <ul style="margin: 8px 0 12px 20px; line-height: 1.6;">
+                    <li><code>has_missing_material: true</code> (at the top level)</li>
+                    <li><code>warnings: ["Material Name is blank in PDF for program '...'"]</code></li>
+                    <li>Inside each program: <code>is_material_blank: true</code> and <code>"Material Name": ""</code></li>
+                </ul>
+
+                <h4 style="margin: 12px 0 6px 0;">VB.NET Code to Show Warning Pop-up and Highlight TextBox</h4>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Form5.vb — In ComboBoxProgramCode_SelectedIndexChanged</span>
+                        <span>VB.NET</span>
+                    </div>
+<pre><span class="cm">' Check if Material is blank in the PDF for the selected program</span>
+<span class="kw">Dim</span> isMaterialBlank <span class="kw">As Boolean</span> = <span class="kw">False</span>
+<span class="kw">If</span> p(<span class="st">"is_material_blank"</span>) <span class="kw">IsNot Nothing AndAlso</span> CBool(p(<span class="st">"is_material_blank"</span>)) <span class="kw">Then</span>
+    isMaterialBlank = <span class="kw">True</span>
+<span class="kw">ElseIf String</span>.IsNullOrWhiteSpace(p(<span class="st">"Material Name"</span>).ToString()) <span class="kw">Then</span>
+    isMaterialBlank = <span class="kw">True</span>
+<span class="kw">End If</span>
+
+<span class="kw">If</span> isMaterialBlank <span class="kw">Then</span>
+    TextBox16.Text = <span class="st">""</span>
+    TextBox16.BackColor = Color.LightPink <span class="cm">' Visually warn user</span>
+    MessageBox.Show(
+        <span class="st">"⚠️ Warning: Material is blank in the PDF for program '"</span> &amp; programName &amp; <span class="st">"'."</span> &amp; vbCrLf &amp; vbCrLf &amp;
+        <span class="st">"Please manually enter or select the Material Name in TextBox16 before proceeding."</span>,
+        <span class="st">"Missing Material"</span>,
+        MessageBoxButtons.OK,
+        MessageBoxIcon.Warning
+    )
+    TextBox16.Focus()
+<span class="kw">Else</span>
+    TextBox16.Text = p(<span class="st">"Material Name"</span>).ToString()
+    TextBox16.BackColor = Color.White
+<span class="kw">End If</span></pre>
+                </div>
+
+                <div class="callout">
+                    <strong>Safeguard on Save:</strong> In <code>Button10_Click</code>, make sure to add:
+                    <br>
+                    <code>If String.IsNullOrWhiteSpace(TextBox16.Text) Then MessageBox.Show("Please enter Material Name before saving!") : Return</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
